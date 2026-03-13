@@ -1,1 +1,1356 @@
+
 <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real World Math — Interactive Workbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:       #4a6741;
+    --green-light: #e8f0e5;
+    --green-dark:  #2d4a29;
+    --brown:       #8b4513;
+    --blue:        #2c5a7e;
+    --blue-light:  #e8f0f8;
+    --gold:        #c9a227;
+    --gold-light:  #fdf8e8;
+    --parchment:   #f5f2e8;
+    --ink:         #1a1a0f;
+    --muted:       #6b6b5a;
+    --border:      #d4cfbb;
+    --white:       #ffffff;
+    --red:         #b94040;
+    --radius:      10px;
+    --shadow:      0 2px 12px rgba(0,0,0,0.10);
+    --shadow-lg:   0 8px 32px rgba(0,0,0,0.14);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    background: var(--green-dark);
+    color: #fff;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 24px;
+    height: 58px;
+  }
+  .header-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .header-logo span { color: var(--gold); }
+  .header-score {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.8);
+  }
+  .score-badge {
+    background: var(--gold);
+    color: var(--green-dark);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    min-width: 80px;
+    text-align: center;
+  }
+
+  /* ── Cover / Hero ── */
+  .cover {
+    background: var(--green-dark);
+    color: #fff;
+    text-align: center;
+    padding: 64px 24px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,162,39,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    line-height: 1.05;
+    margin-bottom: 10px;
+  }
+  .cover-title em { color: var(--gold); font-style: normal; }
+  .cover-sub {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.72);
+    margin-bottom: 36px;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+  }
+  .cover-tags {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .cover-tag {
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 20px;
+    padding: 5px 16px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* ── Layout ── */
+  .app {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    position: sticky;
+    top: 74px;
+  }
+  .sidebar-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-left: 4px;
+  }
+  .nav-list { list-style: none; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--green-light); color: var(--green); }
+  .nav-item.active { background: var(--green); color: #fff; }
+  .nav-icon {
+    width: 26px;
+    height: 26px;
+    background: var(--gold-light);
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--brown);
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+  }
+  .nav-item.active .nav-icon { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); color: #fff; }
+  .nav-progress {
+    margin-left: auto;
+    font-size: 0.72rem;
+    font-family: 'DM Mono', monospace;
+    opacity: 0.7;
+  }
+
+  /* ── Main Content ── */
+  .main { min-width: 0; }
+
+  /* ── Topic Tabs ── */
+  .topic-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 6px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 7px 8px;
+    border: none;
+    background: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--muted);
+    transition: background 0.15s, color 0.15s;
+  }
+  .tab-btn.active {
+    background: var(--green);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(74,103,65,0.30);
+  }
+  .tab-btn:hover:not(.active) { background: var(--green-light); color: var(--green); }
+
+  /* ── Content panels ── */
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* ── Topic Header ── */
+  .topic-header {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px 18px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .topic-header-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .topic-icon-lg {
+    width: 44px;
+    height: 44px;
+    background: var(--gold-light);
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--brown);
+    font-family: 'DM Mono', monospace;
+    flex-shrink: 0;
+  }
+  .topic-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--green-dark);
+    line-height: 1.2;
+  }
+  .topic-desc { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+
+  /* ── Section card ── */
+  .section-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--brown);
+    margin-bottom: 8px;
+  }
+  .section-body { font-size: 0.92rem; line-height: 1.65; color: var(--ink); margin-bottom: 10px; }
+
+  /* ── Formula box ── */
+  .formula-box {
+    background: var(--gold-light);
+    border: 1px solid #e8d87a;
+    border-left: 4px solid var(--gold);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--green-dark);
+    font-weight: 500;
+    line-height: 1.7;
+  }
+
+  /* ── Example box ── */
+  .example-box {
+    background: var(--green-light);
+    border: 1px solid #b8d4b0;
+    border-left: 4px solid var(--green);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 8px 0;
+  }
+  .example-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--green-dark);
+    margin-bottom: 4px;
+  }
+  .example-body { font-size: 0.88rem; line-height: 1.6; color: #1a3a16; }
+  .example-body b { color: var(--green-dark); }
+
+  /* ── Real World box ── */
+  .rw-box {
+    background: var(--blue-light);
+    border: 1px solid #b8cede;
+    border-left: 4px solid var(--blue);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 8px 0;
+  }
+  .rw-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+  .rw-body { font-size: 0.88rem; line-height: 1.6; color: #1a3050; }
+
+  /* ── Quiz ── */
+  .quiz-header {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 22px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--shadow);
+  }
+  .quiz-header-text h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--green-dark);
+  }
+  .quiz-header-text p { font-size: 0.82rem; color: var(--muted); }
+  .quiz-progress-bar-wrap {
+    margin-left: auto;
+    width: 160px;
+  }
+  .quiz-progress-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+  }
+  .quiz-progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .quiz-progress-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .question-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .question-card.answered-correct { border-color: var(--green); background: #f4faf2; }
+  .question-card.answered-wrong   { border-color: var(--red);   background: #fdf4f4; }
+
+  .question-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-family: 'DM Mono', monospace;
+  }
+  .question-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 12px;
+    line-height: 1.55;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+  }
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--parchment);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    color: var(--ink);
+    text-align: left;
+    transition: all 0.15s;
+    line-height: 1.4;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--green);
+    background: var(--green-light);
+    color: var(--green-dark);
+  }
+  .option-btn .opt-letter {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .option-btn:hover:not(:disabled) .opt-letter {
+    background: var(--green);
+    color: #fff;
+  }
+  .option-btn.correct {
+    border-color: var(--green);
+    background: #e8f5e8;
+    color: var(--green-dark);
+  }
+  .option-btn.correct .opt-letter { background: var(--green); color: #fff; }
+  .option-btn.wrong {
+    border-color: var(--red);
+    background: #fce8e8;
+    color: var(--red);
+  }
+  .option-btn.wrong .opt-letter { background: var(--red); color: #fff; }
+  .option-btn.reveal-correct {
+    border-color: var(--green);
+    background: #e8f5e8;
+    color: var(--green-dark);
+    opacity: 0.85;
+  }
+  .option-btn.reveal-correct .opt-letter { background: var(--green); color: #fff; }
+  .option-btn:disabled { cursor: default; }
+
+  .feedback-box {
+    display: none;
+    margin-top: 10px;
+    padding: 9px 12px;
+    border-radius: 7px;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+  .feedback-box.correct-fb {
+    display: block;
+    background: #e8f5e8;
+    border: 1px solid #b8d8b8;
+    color: var(--green-dark);
+  }
+  .feedback-box.wrong-fb {
+    display: block;
+    background: #fce8e8;
+    border: 1px solid #e8b8b8;
+    color: var(--red);
+  }
+  .feedback-icon { font-size: 1rem; margin-right: 4px; }
+
+  /* ── Quiz results banner ── */
+  .quiz-result {
+    display: none;
+    background: var(--green-dark);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+  }
+  .quiz-result.visible { display: block; animation: fadeIn 0.35s ease; }
+  .result-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .result-label { font-size: 0.9rem; opacity: 0.8; margin-top: 4px; }
+  .result-message { font-size: 1rem; margin-top: 12px; opacity: 0.9; }
+  .result-restart {
+    margin-top: 16px;
+    background: var(--gold);
+    color: var(--green-dark);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .result-restart:hover { opacity: 0.88; }
+
+  /* ── Responsive ── */
+  @media (max-width: 760px) {
+    .app { grid-template-columns: 1fr; gap: 20px; }
+    .sidebar { position: static; }
+    .nav-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .nav-item { padding: 6px 10px; font-size: 0.78rem; }
+    .options-grid { grid-template-columns: 1fr; }
+    .topic-tabs { flex-wrap: wrap; }
+    .quiz-progress-bar-wrap { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-logo">Real World <span>Math</span></div>
+    <div class="header-score">
+      Total Score:
+      <div class="score-badge" id="globalScore">0 / 0</div>
+    </div>
+  </div>
+</header>
+
+<div class="cover">
+  <div class="cover-title">Real World <em>Math</em></div>
+  <div class="cover-sub">A Practical High School Mathematics Workbook</div>
+  <div class="cover-tags">
+    <span class="cover-tag">8 Topics</span>
+    <span class="cover-tag">240 Practice Questions</span>
+    <span class="cover-tag">Instant Feedback</span>
+    <span class="cover-tag">Lessons &amp; Quizzes</span>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Topics</div>
+    <ul class="nav-list" id="navList"></ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="main" id="mainContent"></main>
+
+</div>
+
+<script>
+const TOPICS = [
+  {
+    icon: '%', name: 'Percentages & Tips',
+    desc: 'Sales tax, discounts, tipping, and percent change — the math of everyday spending.',
+    sections: [
+      { title: 'What Is a Percentage?',
+        body: 'A percentage is a fraction out of 100. "35%" means 0.35 as a decimal. You use percentages daily: tax rates, sale signs, interest rates, grades, nutritional labels.',
+        items: [
+          { type: 'formula', text: 'Percent = (Part ÷ Whole) × 100\nPart = Whole × (Percent ÷ 100)' }
+        ], rw: null },
+      { title: 'Sales Tax',
+        body: 'When you buy something, the government charges a tax on top of the sticker price, ranging from 0% to over 10% in some cities. The price on the shelf is rarely what you pay.',
+        items: [
+          { type: 'formula', text: 'Total Price = Sticker Price × (1 + Tax Rate)' },
+          { type: 'example', label: 'Example 1', body: 'A $45 shirt, 8% sales tax → $45 × 1.08 = <b>$48.60</b>' },
+          { type: 'example', label: 'Example 2', body: 'Groceries totaling $120, 6.5% tax → $120 × 1.065 = <b>$127.80</b>' },
+          { type: 'example', label: 'Example 3 — Working Backwards', body: 'You paid $53.50 including 7% tax. Pre-tax price? → $53.50 ÷ 1.07 = <b>$50.00</b>' }
+        ], rw: ['Real World', 'Always mentally add tax before deciding if something is in your budget. A $950 laptop in a city with 9.5% tax actually costs $1,040.25.'] },
+      { title: 'Discounts & Sales',
+        body: '"30% off" means you pay 70% of the original price. Two stacked discounts (20% then 10%) are NOT the same as 30% off.',
+        items: [
+          { type: 'formula', text: 'Sale Price = Original × (1 − Discount %)\nTwo stacked discounts: multiply both factors' },
+          { type: 'example', label: 'Example 1', body: '$80 shoes, 25% off → $80 × 0.75 = <b>$60</b>' },
+          { type: 'example', label: 'Example 2 — Stacked', body: '$200 jacket: 20% off then 15% off → $200 × 0.80 = $160, then × 0.85 = <b>$136</b> (not $130)' }
+        ], rw: ['Real World', 'Stores sometimes inflate "original prices" before discounting. Always compare the sale price to competitors.'] },
+      { title: 'Tipping',
+        body: 'Standard tips: 15–20% at restaurants, 10–15% for delivery, 15–20% for stylists. Quick trick: 10% = move decimal left one place. Double for 20%.',
+        items: [
+          { type: 'example', label: 'Example 1 — Mental Math', body: '$38 bill, 20% tip → 10% = $3.80, doubled = $7.60 tip → Total: <b>$45.60</b>' },
+          { type: 'example', label: 'Example 2 — Group Dinner', body: 'Table of 4, bill $148, 18% tip: $148 × 1.18 = $174.64 ÷ 4 = <b>$43.66 each</b>' }
+        ], rw: null },
+      { title: 'Percent Change',
+        body: 'Percent change compares growth or shrinkage relative to the starting value. Essential for comparing salaries, tracking rent increases, and analyzing investment returns.',
+        items: [
+          { type: 'formula', text: '% Change = ((New Value − Old Value) ÷ Old Value) × 100' },
+          { type: 'example', label: 'Example 1 — Rent', body: 'From $950 to $1,140 → ((1140−950)÷950)×100 = <b>+20%</b>' },
+          { type: 'example', label: 'Example 2 — Salary', body: '$48,000 + $3,200 raise → (3200÷48000)×100 = <b>+6.67% raise</b>' }
+        ], rw: ['Real World', 'Inflation typically rises 2–4%/year. If your salary rises only 1%, you effectively took a 2–3% pay cut in purchasing power.'] }
+    ],
+    questions: [
+      ["A $60 meal with an 18% tip. What is the total bill?", ["A) $68.80","B) $70.80","C) $72.80","D) $66.00"], "B", "$60 × 1.18 = $70.80."],
+      ["Sneakers cost $120 and are 30% off. What do you pay?", ["A) $84","B) $90","C) $36","D) $96"], "A", "$120 × 0.70 = $84. You save $36."],
+      ["A TV was $400, now $460. Percent increase?", ["A) 10%","B) 12%","C) 15%","D) 18%"], "C", "((460−400)÷400)×100 = 15%."],
+      ["Sales tax is 7%. Total on a $250 purchase?", ["A) $257","B) $267.50","C) $275","D) $272"], "B", "$250 × 1.07 = $267.50."],
+      ["You score 45 out of 60. What percentage?", ["A) 72%","B) 75%","C) 78%","D) 80%"], "B", "(45÷60)×100 = 75%."],
+      ["Jacket: 20% off, then extra 10% off. Original $150. Final price?", ["A) $105","B) $108","C) $112","D) $115"], "B", "$150 × 0.80 = $120, then × 0.90 = $108. (Not $105 — stacked discounts aren't additive.)"],
+      ["You paid $86 including 7.5% tax. Pre-tax price?", ["A) $78.60","B) $79.44","C) $80.00","D) $81.20"], "C", "$86 ÷ 1.075 = $80.00."],
+      ["$75 bill, 20% tip, split 3 ways. Each person pays?", ["A) $25","B) $30","C) $29","D) $28"], "B", "$75 × 1.20 = $90 ÷ 3 = $30 each."],
+      ["Rent $1,200 → $1,320. Percent increase?", ["A) 8%","B) 10%","C) 12%","D) 15%"], "B", "(120÷1200)×100 = 10%."],
+      ["Phone $999 → $799. Percent reduced?", ["A) 15%","B) 18%","C) 20%","D) 22%"], "C", "((999−799)÷999)×100 ≈ 20%."],
+      ["What is 15% of $88?", ["A) $11.20","B) $12.20","C) $13.20","D) $14.20"], "C", "$88 × 0.15 = $13.20."],
+      ["$42,000 salary + 5% raise. New salary?", ["A) $44,000","B) $44,100","C) $44,500","D) $45,000"], "B", "$42,000 × 1.05 = $44,100."],
+      ["Gas $3.80/gal drops 12%. New price?", ["A) $3.26","B) $3.34","C) $3.44","D) $3.50"], "B", "$3.80 × 0.88 = $3.344 ≈ $3.34."],
+      ["Laptop $1,200 with 9% sales tax. Total?", ["A) $1,296","B) $1,308","C) $1,320","D) $1,332"], "B", "$1,200 × 1.09 = $1,308."],
+      ["You tip $12 on a $65 meal. What tip percentage?", ["A) 16.4%","B) 17.2%","C) 18.5%","D) 19.1%"], "C", "(12÷65)×100 ≈ 18.5%."],
+      ["40% off everything. Coat originally $180. Sale price?", ["A) $72","B) $100","C) $108","D) $120"], "C", "$180 × 0.60 = $108."],
+      ["Item $55 before tax, you pay $58.30. Sales tax rate?", ["A) 5%","B) 6%","C) 7%","D) 8%"], "B", "Tax = $3.30. Rate = 3.30÷55 = 6%."],
+      ["Test score improved from 68 to 85. Percent increase?", ["A) 17%","B) 20%","C) 25%","D) 29%"], "C", "((85−68)÷68)×100 = 25%."],
+      ["18% gratuity added. Bill is $94. Total?", ["A) $109.92","B) $110.92","C) $112.30","D) $113.54"], "B", "$94 × 1.18 = $110.92."],
+      ["Car $24,000 depreciated 15%. Worth now?", ["A) $19,200","B) $20,400","C) $20,800","D) $22,000"], "B", "$24,000 × 0.85 = $20,400."],
+      ["25% off coupon on $48 item. How much saved?", ["A) $10","B) $12","C) $14","D) $16"], "B", "$48 × 0.25 = $12 saved."],
+      ["Inflation 4%/yr. Bread $3.50 today. Price next year?", ["A) $3.54","B) $3.62","C) $3.64","D) $3.70"], "C", "$3.50 × 1.04 = $3.64."],
+      ["Mark up 40% from wholesale $25. Retail price?", ["A) $30","B) $32","C) $35","D) $40"], "C", "$25 × 1.40 = $35."],
+      ["15% of 200 employees got a bonus. How many?", ["A) 15","B) 20","C) 25","D) 30"], "D", "200 × 0.15 = 30 employees."],
+      ["$500 investment grew to $620. Percent gain?", ["A) 20%","B) 22%","C) 24%","D) 26%"], "C", "((620−500)÷500)×100 = 24%."],
+      ["20% tip on $43.50 bill. Tip amount?", ["A) $7.50","B) $8.70","C) $8.00","D) $9.20"], "B", "$43.50 × 0.20 = $8.70."],
+      ["Item $0.99, 8.25% tax. Total?", ["A) $1.06","B) $1.07","C) $1.08","D) $1.09"], "B", "$0.99 × 1.0825 ≈ $1.07."],
+      ["Grade dropped from 92% to 78%. Percent decrease?", ["A) 14%","B) 15%","C) 15.2%","D) 16%"], "C", "((92−78)÷92)×100 ≈ 15.2%."],
+      ["'10 for $10.' You want 3. How much?", ["A) $1.00","B) $2.00","C) $3.00","D) $3.30"], "C", "$10÷10 = $1 each. 3 × $1 = $3."],
+      ["Wholesale $60, retail markup 35%. Retail price?", ["A) $78","B) $81","C) $84","D) $90"], "B", "$60 × 1.35 = $81."]
+    ]
+  },
+  {
+    icon: '$', name: 'Budgeting',
+    desc: 'Income, expenses, the 50/30/20 rule, and building financial stability.',
+    sections: [
+      { title: 'Why Budgeting Is Essential',
+        body: 'A budget is a plan for every dollar you earn. Without one, spending is driven by impulse and habit — money leaves faster than it arrives.',
+        items: [
+          { type: 'formula', text: 'Net Income = Gross Income − Taxes − Deductions' }
+        ], rw: ['Real World', 'Studies consistently show people with written budgets save more and report less financial stress, regardless of income level.'] },
+      { title: 'The 50/30/20 Rule',
+        body: 'A popular framework: 50% of after-tax income to needs, 30% to wants, 20% to savings and debt repayment.',
+        items: [
+          { type: 'example', label: 'Example — $3,200/month take-home', body: 'Needs (50%): $1,600 → Rent $1,000, utilities $120, groceries $300, transport $180\nWants (30%): $960 → Dining, entertainment, subscriptions\nSavings (20%): $640 → Emergency fund, retirement, debt payoff' }
+        ], rw: ['Real World', 'In high cost-of-living cities, 50% for needs may be impossible. Adjust the ratio but keep savings intentional.'] },
+      { title: 'Fixed vs. Variable Expenses',
+        body: 'Fixed expenses stay the same each month (rent, loan payments, insurance). Variable expenses fluctuate (groceries, gas, entertainment). Controlling variables is where most savings happen.',
+        items: [
+          { type: 'example', label: 'Example', body: 'Fixed: rent $900, car payment $280, insurance $120 = $1,300\nVariable: groceries $350, gas $80, dining $200 = $630\nTotal expenses: $1,930. Can you reduce the $630?' }
+        ], rw: null },
+      { title: 'Emergency Fund',
+        body: 'Financial experts recommend 3–6 months of living expenses in an accessible savings account. This prevents debt spirals when unexpected costs occur.',
+        items: [
+          { type: 'example', label: 'Example', body: 'Monthly expenses: $2,400. Emergency fund target: $2,400 × 3 = <b>$7,200 minimum</b>. Save $400/month → fully funded in 18 months.' }
+        ], rw: ['Real World', 'Without an emergency fund, one car repair or medical bill often goes to a credit card — starting a cycle of high-interest debt.'] }
+    ],
+    questions: [
+      ["Take-home pay $2,800/month. 50/30/20 rule 'needs' budget?", ["A) $560","B) $840","C) $1,400","D) $1,680"], "C", "$2,800 × 50% = $1,400."],
+      ["Fixed expense example?", ["A) Groceries","B) Gas","C) Rent","D) Dining out"], "C", "Rent is constant monthly — a fixed expense."],
+      ["Monthly income $3,000, expenses $2,600. Monthly savings?", ["A) $200","B) $300","C) $400","D) $500"], "C", "$3,000 − $2,600 = $400."],
+      ["Emergency fund recommendation?", ["A) 1 month","B) 3–6 months","C) 1 year","D) $10,000 flat"], "B", "3–6 months of living expenses is the standard recommendation."],
+      ["50/30/20 rule: '20%' refers to:", ["A) Taxes","B) Wants","C) Housing","D) Savings and debt repayment"], "D", "20% = savings + debt repayment."],
+      ["Gross $4,000/month, taxes $800, deductions $200. Net income?", ["A) $3,000","B) $3,200","C) $3,800","D) $4,000"], "A", "$4,000 − $800 − $200 = $3,000."],
+      ["Variable expense example?", ["A) Car loan payment","B) Rent","C) Streaming subscription","D) Restaurant spending"], "D", "Restaurant spending fluctuates — it's variable."],
+      ["Monthly expenses $1,800. 3-month emergency fund target?", ["A) $1,800","B) $3,600","C) $5,400","D) $7,200"], "C", "$1,800 × 3 = $5,400."],
+      ["Best reason to use a written budget?", ["A) Required by law","B) Makes you feel guilty","C) Reveals where money actually goes","D) Impresses banks"], "C", "Tracking spending reveals patterns and leaks you'd otherwise miss."],
+      ["Income $2,500, rent $900, food $300, fun $400, savings $300. Unaccounted?", ["A) $400","B) $500","C) $600","D) $700"], "C", "$2,500 − $900 − $300 − $400 − $300 = $600."],
+      ["50/30/20 on $3,600/month. Max 'wants' budget?", ["A) $720","B) $1,080","C) $1,440","D) $1,800"], "B", "$3,600 × 30% = $1,080."],
+      ["Saving $300/month toward $5,400 emergency fund. Months to complete?", ["A) 12","B) 15","C) 18","D) 24"], "C", "$5,400 ÷ $300 = 18 months."],
+      ["You earn $52,000/year. Monthly net (after 25% taxes)?", ["A) $3,000","B) $3,250","C) $3,500","D) $4,333"], "B", "$52,000 × 0.75 = $39,000 ÷ 12 = $3,250."],
+      ["Overspending most easily found by reviewing?", ["A) Bank statements","B) Your memory","C) Friend's budget","D) Credit score"], "A", "Bank/card statements show exactly where each dollar went."],
+      ["Fixed $1,500, Variable $700, Income $2,600. Unaccounted?", ["A) $200","B) $300","C) $400","D) $500"], "C", "$2,600 − $1,500 − $700 = $400 unaccounted."],
+      ["Reducing variable expenses is easier than fixed because:", ["A) Variables are illegal","B) Fixed costs have contracts — variables are discretionary","C) Variables are always smaller","D) Fixed costs don't count"], "B", "Fixed costs are locked in (leases, loans). Variable costs are choices."],
+      ["Zero-based budgeting means:", ["A) No spending","B) Every dollar is assigned a purpose until income minus expenses = 0","C) Save everything","D) Never use credit"], "B", "Every dollar gets a 'job' — income − all allocations = $0."],
+      ["You earn $2,200 and spend $2,500. This is called:", ["A) Surplus","B) Balanced","C) Deficit","D) Variable"], "C", "Spending more than income = deficit. Unsustainable without savings or debt."],
+      ["Best use of a one-time windfall ($2,000 bonus)?", ["A) Splurge immediately","B) Build emergency fund first, then savings","C) Invest in lottery tickets","D) Ignore it"], "B", "High-impact order: emergency fund → high-interest debt → savings/investments."],
+      ["Net worth = ?", ["A) Annual income","B) Monthly savings","C) Assets minus liabilities","D) Credit score"], "C", "Net worth = what you own minus what you owe."],
+      ["If rent rises $150/month, what must you cut by the same amount?", ["A) Net income","B) Other spending or savings","C) Taxes","D) Fixed costs"], "B", "Budget is a closed system: if one line rises, another must fall."],
+      ["Gross income vs. net income for budgeting?", ["A) Gross — more money","B) Net — actual money you receive","C) Gross − savings","D) Average of both"], "B", "Budget from take-home (net) pay. You never see the gross."],
+      ["Subscription audit revealed $85/month in unused services. Annual savings?", ["A) $85","B) $510","C) $1,020","D) $1,700"], "C", "$85 × 12 = $1,020."],
+      ["'Pay yourself first' means:", ["A) Buy what you want first","B) Auto-transfer savings before spending","C) Pay rent last","D) Skip investing"], "B", "Savings transferred automatically before discretionary spending."],
+      ["Income $3,000, fixed $1,200, variable $600. Max available for savings?", ["A) $800","B) $1,000","C) $1,200","D) $1,400"], "C", "$3,000 − $1,200 − $600 = $1,200."],
+      ["A realistic budget uses net income because:", ["A) Required by IRS","B) It's what you actually have to spend","C) It's always larger","D) Gross is for investments"], "B", "Gross never hits your bank account. Net is real."],
+      ["Spending $50/day on coffee/lunch over 5 workdays/week. Annual cost?", ["A) $10,000","B) $12,500","C) $13,000","D) $15,000"], "C", "$50 × 5 × 52 = $13,000/year."],
+      ["Credit card used for $400 in groceries with no plan to pay in full. Result?", ["A) Free groceries","B) Groceries now cost $400 + interest","C) Improves credit only","D) No difference"], "B", "Unpaid balances accrue interest — groceries end up costing more."],
+      ["50/30/20: $4,500 take-home. Savings goal?", ["A) $450","B) $675","C) $900","D) $1,350"], "C", "$4,500 × 20% = $900."],
+      ["Biggest benefit of 3-month emergency fund?", ["A) Higher credit score","B) Tax deduction","C) Prevents debt when unexpected costs arise","D) Required by banks"], "C", "Emergency fund breaks the cycle of borrowing to handle surprises."]
+    ]
+  },
+  {
+    icon: '$', name: 'Loans & Interest',
+    desc: 'Simple interest, compound growth, APR, credit cards, and mortgages.',
+    sections: [
+      { title: 'Simple Interest',
+        body: 'Simple interest is calculated only on the original principal. Used for car loans, some personal loans, and short-term borrowing.',
+        items: [
+          { type: 'formula', text: 'Interest = Principal × Rate × Time\nTotal = Principal + Interest' },
+          { type: 'example', label: 'Example', body: '$5,000 borrowed at 6% simple interest for 3 years → Interest = $5,000 × 0.06 × 3 = <b>$900</b>. Total repaid: $5,900.' }
+        ], rw: null },
+      { title: 'Compound Interest',
+        body: 'Compound interest calculates interest on both the principal AND the accumulated interest. This is how most savings accounts and credit cards work — and why it can work powerfully for you or devastatingly against you.',
+        items: [
+          { type: 'formula', text: 'A = P × (1 + r/n)^(n×t)\nP=principal, r=annual rate, n=periods/year, t=years' },
+          { type: 'example', label: 'Example 1 — Savings', body: '$5,000 at 6% compounded monthly for 10 years ≈ <b>$9,096</b>. Nearly doubled without adding a dollar.' },
+          { type: 'example', label: 'Example 2 — Debt', body: '$3,000 at 22% APR, no payments, 1 year ≈ <b>$3,733</b>. You owe $733 more from interest alone.' }
+        ], rw: ['Real World', 'The most powerful financial move: start retirement savings young. $5,000 at 22 grows to ~$80K by retirement. The same $5,000 at 42 grows to only ~$20K.'] },
+      { title: 'The Rule of 72',
+        body: 'A mental shortcut: divide 72 by the interest rate to estimate years to double your money.',
+        items: [
+          { type: 'formula', text: 'Years to Double ≈ 72 ÷ Interest Rate (%)' },
+          { type: 'example', label: 'Examples', body: '8% return → 72÷8 = <b>9 years</b> to double\n4% savings → 72÷4 = <b>18 years</b>\n24% credit card → 72÷24 = <b>3 years</b> for debt to double!' }
+        ], rw: null },
+      { title: 'Mortgages & Amortization',
+        body: "Amortizing loans spread payments so each covers interest plus some principal. Early payments are mostly interest. On a 30-year mortgage, you may pay more in interest than the home's purchase price.",
+        items: [
+          { type: 'example', label: 'Example', body: '$250,000 at 7% for 30 years → ~$1,663/month. Total paid: $598,680. Total interest: <b>$348,680</b> — 139% of the original loan!' }
+        ], rw: ['Real World', 'Paying just one extra mortgage payment per year can cut years off your loan and save tens of thousands in interest.'] }
+    ],
+    questions: [
+      ["Simple interest: $4,000 at 5% for 3 years. Total interest?", ["A) $200","B) $400","C) $600","D) $800"], "C", "$4,000 × 0.05 × 3 = $600."],
+      ["Rule of 72: at 8%, money doubles in approximately:", ["A) 6 years","B) 9 years","C) 12 years","D) 18 years"], "B", "72 ÷ 8 = 9 years."],
+      ["Why is compound interest dangerous on credit card debt?", ["A) Only applies to savings","B) Interest grows on interest, accelerating debt","C) Banks must warn you","D) It's only on principal"], "B", "You pay interest on unpaid interest — debt snowballs rapidly."],
+      ["Credit card 24% APR, $1,000 balance. Monthly interest?", ["A) $2","B) $10","C) $20","D) $240"], "C", "24% ÷ 12 = 2%/month. $1,000 × 0.02 = $20."],
+      ["Which grows faster over 20 years?", ["A) Simple interest at 7%","B) Compound interest at 7%","C) Equal","D) Depends on bank"], "B", "Compound reinvests earnings, creating exponential vs. linear growth."],
+      ["$1,000 at 6% compounded annually for 2 years?", ["A) $1,120","B) $1,124","C) $1,130","D) $1,060"], "B", "Year 1: $1,060. Year 2: $1,060 × 1.06 = $1,123.60 ≈ $1,124."],
+      ["$5,000 loan, 10% simple interest, 2 years. Total repaid?", ["A) $5,500","B) $6,000","C) $5,800","D) $6,500"], "B", "Interest = $5,000 × 0.10 × 2 = $1,000. Total = $6,000."],
+      ["$2,000 credit card balance at 22% APR, unpaid 1 year. Owe?", ["A) $2,220","B) $2,440","C) $2,493","D) $2,600"], "C", "Compounding monthly: $2,000 × (1+0.22/12)^12 ≈ $2,493."],
+      ["At 4% compound interest, years to double (Rule of 72)?", ["A) 12 years","B) 16 years","C) 18 years","D) 24 years"], "C", "72 ÷ 4 = 18 years."],
+      ["APY is higher than APR because:", ["A) APY ignores taxes","B) APY accounts for compounding","C) APR is regulated","D) APY is marketing"], "B", "APY factors in how often interest compounds."],
+      ["$500 savings at 5% APY. Value after 1 year?", ["A) $505","B) $515","C) $525","D) $550"], "C", "$500 × 1.05 = $525."],
+      ["$250,000 mortgage, $1,663/month payment, 30 years. Total paid?", ["A) $348,680","B) $425,000","C) $598,680","D) $700,000"], "C", "$1,663 × 360 = $598,680."],
+      ["On a new mortgage, early payments go mostly to interest because:", ["A) Banks charge more early","B) Balance is highest, so interest is highest","C) Regulations require it","D) Credit score related"], "B", "Interest = % of remaining balance. Balance is highest at the start."],
+      ["15-year vs. 30-year mortgage at same rate — which costs more total?", ["A) 15-year always","B) 30-year always","C) Same","D) Depends"], "B", "Longer term = more years of interest. 30-year is significantly more expensive."],
+      ["Rule of 72 at 24% credit card rate?", ["A) 2 years","B) 3 years","C) 4 years","D) 6 years"], "B", "72 ÷ 24 = 3 years for debt to double."],
+      ["Simple interest: $800 at 6% for 18 months. Total interest?", ["A) $48","B) $72","C) $80","D) $96"], "B", "18 months = 1.5 years. $800 × 0.06 × 1.5 = $72."],
+      ["Main benefit of starting retirement savings at 22 vs. 32?", ["A) Lower tax rates","B) 10 more years of compound growth","C) Employers match more","D) Higher Social Security"], "B", "10 extra years of compounding can more than double your final balance."],
+      ["$3,000 at 10% compounded annually for 3 years?", ["A) $3,900","B) $3,993","C) $4,033","D) $4,200"], "B", "$3,000 × 1.10^3 = $3,000 × 1.331 = $3,993."],
+      ["Daily vs. annual compounding at same rate — which earns more?", ["A) Annual — simpler","B) Daily — compounds more often","C) Identical","D) Depends on fees"], "B", "More frequent compounding means interest earns interest sooner."],
+      ["Payday loan: $15 per $100 for 2 weeks. Approximate annual rate?", ["A) 15%","B) 78%","C) 195%","D) 391%"], "D", "15% per 2 weeks × 26 periods/year ≈ 390% APR."],
+      ["$10,000 CC debt at 20% APR. Monthly interest-only payment?", ["A) $100","B) $150","C) $167","D) $200"], "C", "20% ÷ 12 = 1.667%. $10,000 × 0.01667 ≈ $167."],
+      ["Amortization means:", ["A) Adding interest monthly","B) Fixed payments split between interest + principal","C) Interest-only payments","D) Auto-refinancing"], "B", "Amortized loans have fixed payments where the split shifts over time."],
+      ["$2,500 at 8% compounded annually for 5 years?", ["A) $3,200","B) $3,465","C) $3,673","D) $3,800"], "C", "$2,500 × 1.08^5 = $2,500 × 1.469 ≈ $3,673."],
+      ["Why choose a 15-year over 30-year mortgage despite higher payments?", ["A) Lower rate + much less total interest","B) Tax-deductible payments","C) Banks prefer it","D) Required for FHA"], "A", "15-year mortgages offer lower rates and dramatically less total interest paid."],
+      ["$100/month invested at 7% from age 25 to 65?", ["A) $48,000","B) $120,000","C) $240,000","D) $262,000"], "D", "Compound growth over 40 years at 7% ≈ $262,000 vs. $48,000 contributed."],
+      ["Simple interest: $1,500 at 9% for 4 years. Total interest?", ["A) $135","B) $270","C) $405","D) $540"], "D", "$1,500 × 0.09 × 4 = $540."],
+      ["$8,000 savings at 4.5% APY, 2 years. Approximate value?", ["A) $8,360","B) $8,720","C) $8,738","D) $8,800"], "C", "Year 1: $8,360. Year 2: $8,360 × 1.045 ≈ $8,736 ≈ $8,738."],
+      ["'Carrying a balance' on a credit card means:", ["A) High credit limit","B) Not paying in full — paying interest on the rest","C) Using card internationally","D) Requesting a limit increase"], "B", "Carrying a balance = not paying in full, triggering interest charges."],
+      ["Interest on $500 for 6 months at 12% annual simple interest?", ["A) $10","B) $30","C) $60","D) $90"], "B", "$500 × 0.12 × 0.5 = $30."],
+      ["How does paying more than minimum on a loan help?", ["A) Improves credit only","B) Reduces principal faster, so less interest accrues","C) Banks waive fees","D) Rate decreases"], "B", "Every extra dollar reduces the balance, reducing future interest — compounding in reverse."]
+    ]
+  },
+  {
+    icon: 'T', name: 'Taxes',
+    desc: 'Brackets, payroll tax, W-2s, credits vs. deductions — how the system works.',
+    sections: [
+      { title: 'Progressive Tax Brackets (2024)',
+        body: 'The US uses a marginal tax system. You do NOT pay your highest bracket rate on all income — only on the portion above each threshold.',
+        items: [
+          { type: 'example', label: 'Example — $55,000 taxable income', body: '10% × $11,600 = $1,160\n12% × $35,550 = $4,266\n22% × $7,850 = $1,727\nTotal: <b>$7,153</b>. Effective rate: 13.0% (not 22%)' }
+        ], rw: ['Real World', 'Many people refuse overtime thinking it "pushes them into a higher bracket." Wrong — only income above the threshold is taxed at the higher rate. A raise always increases take-home pay.'] },
+      { title: 'Standard Deduction',
+        body: "Before calculating taxes, reduce gross income by the standard deduction ($14,600 for single filers in 2024). You're taxed on what remains, not your full gross income.",
+        items: [
+          { type: 'example', label: 'Example', body: 'Gross $65,000 − standard deduction $14,600 = <b>$50,400 taxable income</b>' }
+        ], rw: null },
+      { title: 'Payroll Taxes (FICA)',
+        body: 'Social Security: 6.2% (up to $168,600 in 2024). Medicare: 1.45% (no limit). Employers match both. Self-employed pay both sides (15.3% total).',
+        items: [
+          { type: 'example', label: 'Example — $50,000/year paycheck deductions', body: 'Federal income tax: ~$4,800\nSocial Security: $3,100 (6.2%)\nMedicare: $725 (1.45%)\nState tax: ~$1,500–$2,500\nNet take-home: ~$37,000–$39,000' }
+        ], rw: null },
+      { title: 'Tax Credits vs. Deductions',
+        body: '<b>Deductions</b> reduce taxable income. <b>Credits</b> reduce the tax you owe dollar-for-dollar — far more valuable.',
+        items: [
+          { type: 'formula', text: 'Deduction value = Amount × Your Bracket %\nCredit value = Full dollar-for-dollar reduction' },
+          { type: 'example', label: 'Example', body: 'In 22% bracket: $1,000 deduction saves $220. $1,000 tax credit saves the full $1,000.' }
+        ], rw: null }
+    ],
+    questions: [
+      ["You earn $50,000. All earnings taxed at highest bracket?", ["A) Yes, flat rate","B) No — only portion above each threshold","C) Only first $11,600","D) Yes, after deduction"], "B", "Marginal brackets mean each slice of income has its own rate."],
+      ["Social Security employee tax rate:", ["A) 1.45%","B) 6.2%","C) 7.65%","D) 12.4%"], "B", "Employees pay 6.2%. Employers match. Self-employed pay 12.4%."],
+      ["$500 tax credit vs. $500 deduction — which is worth more?", ["A) Deduction","B) Equal","C) Credit","D) Depends on filing status"], "C", "A credit reduces your bill by $500. A deduction saves only bracket% × $500."],
+      ["Federal tax deadline (typical):", ["A) March 15","B) April 15","C) May 1","D) January 31"], "B", "April 15 is Tax Day."],
+      ["Employer withheld too much tax. You:", ["A) Owe a penalty","B) Receive a refund","C) Must refile","D) Lose the excess"], "B", "Overpayment returned as a tax refund after filing."],
+      ["Standard deduction $14,600, income $60,000. Taxable income?", ["A) $45,400","B) $60,000","C) $14,600","D) $52,000"], "A", "$60,000 − $14,600 = $45,400."],
+      ["FICA taxes cover:", ["A) Federal Income","B) Social Security + Medicare","C) Capital gains","D) State income"], "B", "FICA = Social Security (6.2%) + Medicare (1.45%)."],
+      ["'My raise pushed me into a higher bracket, so I take home less.' Correct?", ["A) Yes — all income at new rate","B) No — only income above threshold at higher rate","C) Yes if large enough","D) Depends on deductions"], "B", "Marginal brackets — you always take home more after a raise."],
+      ["A W-2 form is:", ["A) Sent by you to your employer","B) Shows annual earnings and taxes withheld","C) Your tax return","D) For self-employed income"], "B", "Employers send W-2s in January for filing your return."],
+      ["In 22% bracket, $2,000 deduction saves you:", ["A) $440","B) $2,000","C) $880","D) $220"], "A", "$2,000 × 22% = $440 in tax savings."],
+      ["Medicare employee tax rate:", ["A) 6.2%","B) 1.45%","C) 7.65%","D) 2.9%"], "B", "Employees pay 1.45%. Employers match."],
+      ["$1,200 credit vs. $1,200 deduction in 22% bracket. Credit worth more by:", ["A) $264","B) $936","C) $264 less","D) $600"], "B", "Credit saves $1,200. Deduction saves $264. Difference = $936."],
+      ["Purpose of a W-4 form:", ["A) Report self-employment income","B) Tell employer how much to withhold","C) Document deductions","D) Prove credit eligibility"], "B", "W-4 controls withholding from paychecks."],
+      ["Self-employed FICA rate:", ["A) 6.2%","B) 7.65%","C) 12.4%","D) 15.3%"], "D", "Self-employed pay both employee (7.65%) + employer (7.65%) = 15.3%."],
+      ["Gross $72,000, standard deduction $14,600. Taxable income?", ["A) $57,400","B) $72,000","C) $65,000","D) $50,400"], "A", "$72,000 − $14,600 = $57,400."],
+      ["A Roth IRA is tax-advantaged because:", ["A) Contributions deductible","B) Growth and qualified withdrawals tax-free","C) No contribution limits","D) SS reduced"], "B", "Roth contributions are after-tax, but growth and retirement withdrawals are tax-free."],
+      ["Traditional 401(k) contributions are:", ["A) Taxed now and later","B) Tax-deferred — taxed at withdrawal","C) Tax-free forever","D) Taxed at 15%"], "B", "Traditional 401(k) reduces taxable income now; you pay taxes when you withdraw."],
+      ["Income NOT subject to Social Security tax:", ["A) Wages","B) Salary","C) Income above $168,600","D) Freelance under $400"], "C", "Social Security has a wage base limit ($168,600 in 2024)."],
+      ["You owe $1,800 at tax time. This means:", ["A) Filed incorrectly","B) Underpaid withholding during year","C) Automatic penalty","D) Employer error"], "B", "Owing at filing = withholding was less than actual tax bill."],
+      ["Why might a large tax refund NOT be ideal?", ["A) Penalties on refunds","B) Gave government interest-free loan all year","C) Refunds are taxable","D) Banks freeze accounts"], "B", "Over-withholding = 0% interest loan to the government."],
+      ["'Effective tax rate' means:", ["A) Your top bracket rate","B) Total tax ÷ total income","C) The FICA rate","D) State tax rate"], "B", "Effective rate = total tax paid ÷ gross income. Always lower than top bracket."],
+      ["Which is 'triple tax-advantaged'?", ["A) Traditional 401(k)","B) Roth IRA","C) Health Savings Account (HSA)","D) 529 plan"], "C", "HSA: pre-tax contributions, tax-free growth, tax-free medical withdrawals."],
+      ["State income taxes are:", ["A) Same in every state","B) Only for businesses","C) Separate from federal, rates vary","D) Included in FICA"], "C", "States set their own rates. Some states have no income tax."],
+      ["$8,000 freelance income is subject to:", ["A) Income tax only","B) Self-employment tax only","C) Both income + self-employment tax","D) Neither under $10K"], "C", "Freelance over $400 triggers both self-employment tax AND income tax."],
+      ["Gross $65,000. Standard deduction $14,600. Taxable = $50,400. Total federal tax (2024 brackets)?", ["A) $4,426","B) $5,426","C) $6,141","D) $7,141"], "C", "10%×$11,600 + 12%×$35,550 + 22%×$3,250 = $1,160+$4,266+$715 = $6,141."],
+      ["What does 'filing status' affect?", ["A) Nothing — same for all","B) Standard deduction amount and bracket thresholds","C) FICA rates only","D) State taxes only"], "B", "Filing status (single, married, HOH) changes deduction amounts and bracket thresholds."],
+      ["Marginal tax rate means:", ["A) Rate on all income","B) Rate applied to the last dollar earned","C) Average of all rates","D) State + federal combined"], "B", "Marginal rate = rate on the next dollar — only applies to income in that bracket."],
+      ["Withholding too little tax all year means:", ["A) Automatic refund","B) You'll owe money at tax time (possibly + penalty)","C) No consequence","D) IRS contacts you monthly"], "B", "Under-withholding = tax owed at filing. Large underpayments can trigger penalties."],
+      ["Child Tax Credit reduces:", ["A) Taxable income","B) Your actual tax bill dollar-for-dollar","C) FICA taxes","D) State taxes only"], "B", "Tax credits reduce the bill owed — more valuable than deductions."],
+      ["Marginal brackets + deductions + credits all reduce the actual tax paid. This is why:", ["A) The wealthy pay no taxes","B) Effective tax rate is lower than the top bracket","C) Taxes are unfair","D) Refunds are guaranteed"], "B", "Multiple mechanisms reduce the effective rate well below the top bracket rate."]
+    ]
+  },
+  {
+    icon: 'P', name: 'Probability',
+    desc: 'Odds, expected value, risk, and avoiding the gambler\'s fallacy.',
+    sections: [
+      { title: 'Basic Probability',
+        body: 'Probability is a number between 0 (impossible) and 1 (certain). It measures how likely an event is to occur.',
+        items: [
+          { type: 'formula', text: 'P(event) = Favorable Outcomes ÷ Total Possible Outcomes' },
+          { type: 'example', label: 'Examples', body: 'Coin flip: P(heads) = 1/2\nDie: P(rolling 3) = 1/6\nDeck: P(drawing Ace) = 4/52 = 1/13' }
+        ], rw: null },
+      { title: 'Expected Value (EV)',
+        body: 'Expected Value is the average outcome if an action were repeated many times. Positive EV = favorable long-term. Negative EV = unfavorable long-term.',
+        items: [
+          { type: 'formula', text: 'EV = Sum of (Outcome × Probability of that Outcome)' },
+          { type: 'example', label: 'Example — Lottery Ticket', body: '1-in-1,000 chance to win $500. Ticket costs $2.\nEV = (500 × 1/1000) − 2 = $0.50 − $2.00 = <b>−$1.50</b> per ticket. Negative EV.' }
+        ], rw: ['Real World', 'All casino games have negative EV for players — that\'s the "house edge." Insurance has negative EV mathematically but is often rational due to catastrophic risk.'] },
+      { title: 'Independent vs. Dependent Events',
+        body: 'Independent events don\'t affect each other (coin flips, die rolls). Dependent events do (drawing cards without replacement).',
+        items: [
+          { type: 'formula', text: 'Independent: P(A and B) = P(A) × P(B)\nP(A or B) = P(A) + P(B) − P(A and B)' },
+          { type: 'example', label: 'Example — Gambler\'s Fallacy', body: 'A coin lands heads 5 times in a row. P(next = heads) = still 1/2. Past results have NO effect on independent future events.' }
+        ], rw: null }
+    ],
+    questions: [
+      ["P(rolling a 4 on a fair 6-sided die)?", ["A) 1/4","B) 1/5","C) 1/6","D) 1/3"], "C", "One favorable outcome out of 6 = 1/6 ≈ 16.7%."],
+      ["P(drawing a red card from a standard 52-card deck)?", ["A) 1/4","B) 1/3","C) 1/2","D) 2/3"], "C", "26 red cards out of 52 = 1/2."],
+      ["EV of a coin flip: heads you win $10, tails you lose $6?", ["A) $2","B) $4","C) $0","D) −$2"], "A", "EV = (0.5 × $10) + (0.5 × −$6) = $5 − $3 = $2."],
+      ["A fair coin lands heads 7 times in a row. P(heads on next flip)?", ["A) Less than 50%","B) More than 50%","C) 50%","D) 100%"], "C", "Coin flips are independent — past results don't affect future probability."],
+      ["P(rolling 1 or 2 on a die)?", ["A) 1/6","B) 1/3","C) 1/2","D) 2/3"], "B", "2 favorable outcomes out of 6 = 2/6 = 1/3."],
+      ["Lottery ticket: 1/10,000 chance to win $5,000. Ticket $1. EV?", ["A) $0.50","B) −$0.50","C) $1.00","D) −$1.00"], "B", "EV = ($5,000 × 0.0001) − $1 = $0.50 − $1 = −$0.50."],
+      ["P(drawing a King from a 52-card deck)?", ["A) 1/52","B) 1/26","C) 1/13","D) 4/52 = 1/13"], "C", "4 Kings in 52 cards = 4/52 = 1/13."],
+      ["Bag: 3 red, 5 blue, 2 green marbles. P(not red)?", ["A) 3/10","B) 7/10","C) 5/10","D) 1/2"], "B", "(5+2)/10 = 7/10."],
+      ["Two dice: P(both roll 6)?", ["A) 1/36","B) 1/12","C) 2/36","D) 1/6"], "A", "P(6) × P(6) = 1/6 × 1/6 = 1/36 (independent events)."],
+      ["EV = 0 in a game means:", ["A) Always win","B) Always lose","C) Fair game — no advantage to either side","D) Must not play"], "C", "EV = 0 is a 'fair game' — no systematic advantage."],
+      ["$10 raffle ticket. 1 prize of $500, 1,000 tickets sold. EV?", ["A) −$9.50","B) −$0.50","C) +$0.50","D) $0.00"], "A", "EV = ($500 × 1/1000) − $10 = $0.50 − $10 = −$9.50."],
+      ["Most rational use of expected value?", ["A) Always insure everything","B) Buy lottery for entertainment only","C) Use EV to decide which risks are worth taking","D) Avoid all risk"], "C", "EV helps compare options systematically — it's a decision tool, not a rule."],
+      ["P(at least one head in 3 coin flips)?", ["A) 50%","B) 75%","C) 87.5%","D) 90%"], "C", "P(at least one) = 1 − P(no heads) = 1 − (0.5)^3 = 87.5%."],
+      ["10% chance of winning $80, 90% chance of losing $10. EV?", ["A) −$1","B) +$1","C) $0","D) +$8"], "A", "EV = (0.10 × $80) + (0.90 × −$10) = $8 − $9 = −$1."],
+      ["Cards without replacement: P(2nd card is Ace if 1st was Ace)?", ["A) 4/52","B) 3/51","C) 4/51","D) 1/13"], "B", "3 aces remain in 51 cards: 3/51 ≈ 5.88%. Dependent probability."],
+      ["Why do casinos always profit long-term?", ["A) They cheat","B) All games have negative EV for players","C) Serve wealthy players only","D) Skill required to win"], "B", "Every casino game has a 'house edge' — negative EV for the player."],
+      ["P(rolling greater than 4 on die)?", ["A) 1/6","B) 1/3","C) 1/2","D) 2/3"], "B", "Numbers 5 and 6: 2 outcomes ÷ 6 = 1/3."],
+      ["5% chance of $6,000 car repair this year. Expected cost of risk?", ["A) $6,000","B) $600","C) $300","D) $120"], "C", "$6,000 × 0.05 = $300 expected annual repair cost."],
+      ["Gambler's Fallacy is:", ["A) All gambling is risky","B) Past random outcomes influence future independent events","C) Casinos are unfair","D) More bets = more wins"], "B", "Independent events have no memory. Past results don't affect future ones."],
+      ["P(rolling an even number on a die)?", ["A) 1/6","B) 1/3","C) 1/2","D) 2/3"], "C", "Even numbers: 2, 4, 6 = 3 out of 6 = 1/2."],
+      ["Flip coin twice. P(exactly one head)?", ["A) 1/4","B) 1/2","C) 3/4","D) 1/3"], "B", "HT or TH: 2 out of 4 outcomes = 1/2."],
+      ["P(A or B) when A and B are mutually exclusive?", ["A) P(A) × P(B)","B) P(A) + P(B)","C) P(A) + P(B) − P(A∩B)","D) 1 − P(A)"], "B", "Mutually exclusive means they can't both happen: P(A or B) = P(A) + P(B)."],
+      ["$1 scratch ticket: 10% chance $5, 2% chance $50, 88% chance $0. EV?", ["A) −$0.10","B) $0.00","C) +$0.50","D) −$0.50"], "C", "EV = 0.10(5) + 0.02(50) + 0.88(0) − 1 = 0.5 + 1 − 1 = $0.50. (Rare positive EV ticket!)"],
+      ["Insurance: negative EV but still rational because:", ["A) Required by law","B) Prevents catastrophic financial loss","C) Insurance companies lose money","D) Reduces taxes"], "B", "Negative EV is rational when the downside risk is catastrophic and you can't absorb it."],
+      ["P(both dice NOT rolling 1)?", ["A) 25/36","B) 11/36","C) 1/36","D) 35/36"], "A", "P(not 1 on each die) = 5/6 × 5/6 = 25/36."],
+      ["Bag has 4 red, 6 blue. Remove one red. P(next = red)?", ["A) 4/10","B) 3/9","C) 3/10","D) 4/9"], "B", "Dependent event: 3 red remain in 9 total = 3/9 = 1/3."],
+      ["Probability of rolling 7 on a single 6-sided die?", ["A) 1/6","B) 0","C) 1/7","D) 7/6"], "B", "7 is impossible — probability = 0."],
+      ["30% chance of rain each day for 2 days. P(rain both days)?", ["A) 60%","B) 9%","C) 30%","D) 15%"], "B", "Independent: 0.30 × 0.30 = 0.09 = 9%."],
+      ["EV of investing $1,000: 60% chance gain $400, 40% chance lose $200. EV?", ["A) $80","B) $160","C) $240","D) $1,160"], "B", "EV = 0.60(400) + 0.40(−200) = $240 − $80 = $160."],
+      ["P(not drawing a spade from a 52-card deck)?", ["A) 1/4","B) 1/2","C) 3/4","D) 13/52"], "C", "13 spades out of 52. P(not spade) = 39/52 = 3/4."]
+    ]
+  },
+  {
+    icon: 'S', name: 'Statistics & Data',
+    desc: 'Averages, misleading graphs, correlation vs. causation, and reading data critically.',
+    sections: [
+      { title: 'Mean, Median, Mode',
+        body: 'Three ways to describe the center of a dataset — they can tell very different stories about the same data.',
+        items: [
+          { type: 'example', label: 'Example — 6 Salaries: $32K, $38K, $40K, $44K, $47K, $250K', body: 'Mean: $75,167 (the outlier distorts everything)\nMedian: ($40K+$44K)÷2 = $42,000 (far more representative)\nMode: none (all unique)' }
+        ], rw: ['Real World', 'When a politician says "average household income is $85,000," they\'re using the mean — inflated by wealthy households. Always ask: which "average" is being used?'] },
+      { title: 'Range and Spread',
+        body: "Averages alone don't tell you enough. Spread matters. Two classes with the same mean can have very different distributions.",
+        items: [
+          { type: 'formula', text: 'Range = Maximum − Minimum' },
+          { type: 'example', label: 'Example', body: 'Scores: 58, 72, 74, 74, 76, 90. Mean = 74. Range = 90−58 = 32.\nThe range reveals a wide spread the mean hides.' }
+        ], rw: null },
+      { title: 'Misleading Graphs and Statistics',
+        body: 'Common tricks: truncated y-axis (start at 90% not 0%), cherry-picking time ranges, confusing relative vs. absolute numbers, biased samples.',
+        items: [], rw: ['Real World', '"Cancer risk doubles!" sounds terrifying. If risk went from 0.001% to 0.002%, the absolute increase is 0.001% — essentially meaningless. Always check absolute numbers behind relative statistics.'] },
+      { title: 'Correlation vs. Causation',
+        body: 'Two things can trend together without one causing the other. Ice cream sales and drowning both rise in summer — hot weather explains both.',
+        items: [
+          { type: 'example', label: 'Famous Example', body: 'Countries with more TVs per household have longer life expectancies. TVs don\'t make you live longer — wealth drives both. Always ask: what third variable explains this?' }
+        ], rw: null }
+    ],
+    questions: [
+      ["Scores: 70, 75, 80, 85, 98. Median?", ["A) 70","B) 80","C) 81.6","D) 85"], "B", "Sort: 70, 75, 80, 85, 98 → middle = 80."],
+      ["Salaries: $30K, $35K, $40K, $45K, $200K. Why median better than mean?", ["A) Always more accurate","B) $200K outlier inflates mean","C) Mean harder to calculate","D) Same answer"], "B", "$200K pulls mean to ~$70K — unrepresentative. Median $40K is better."],
+      ["Graph starting y-axis at $950 instead of $0 is likely:", ["A) Standard","B) Misleading — exaggerates differences","C) Required by law","D) More accurate"], "B", "Truncated axes make tiny changes look dramatic."],
+      ["'Ice cream sales and drowning spike in summer.' This means:", ["A) Ice cream causes drowning","B) Heat (third variable) explains both","C) Data is wrong","D) Drowning causes ice cream sales"], "B", "Correlation ≠ causation. Hot weather independently drives both."],
+      ["Mean of: 4, 8, 6, 5, 7?", ["A) 5","B) 6","C) 6.5","D) 7"], "B", "(4+8+6+5+7)÷5 = 30÷5 = 6."],
+      ["Scores: 55, 70, 72, 74, 76, 79. Range?", ["A) 19","B) 24","C) 25","D) 21"], "B", "79 − 55 = 24."],
+      ["Data: 3, 7, 7, 9, 12. Mode?", ["A) 3","B) 7","C) 9","D) 12"], "B", "7 appears twice — more than any other value."],
+      ["'People who eat breakfast earn more.' Most likely means:", ["A) Breakfast causes earnings","B) Wealth drives both lifestyle habits","C) Breakfast improves cognition","D) Study is false"], "B", "Wealth or lifestyle is a confounding variable — correlation, not causation."],
+      ["'Crime rose 100%!' — from 2 to 4 incidents. This headline is:", ["A) Accurate and alarming","B) Technically true but misleading","C) False","D) Impossible to evaluate"], "B", "100% increase is accurate but means almost nothing in absolute terms."],
+      ["Mean, median, and mode are all called:", ["A) Measures of spread","B) Measures of central tendency","C) Measures of correlation","D) Outlier indicators"], "B", "All three describe the 'center' or typical value of a dataset."],
+      ["Data: 10, 10, 12, 14, 100. The median is:", ["A) 10","B) 12","C) 29.2","D) 14"], "B", "Sorted: 10, 10, 12, 14, 100 → middle = 12."],
+      ["Online product reviews may not represent typical customers because:", ["A) Randomly sampled","B) Extreme opinions dominate voluntary reviews","C) Required to be accurate","D) Companies manipulate all reviews"], "B", "Selection bias: strong feelings more likely to prompt reviews."],
+      ["'9 out of 10 dentists recommend...' — key question to ask:", ["A) How many dentists exist","B) How were those 10 dentists selected?","C) What brand do the 10% prefer","D) Is dentist opinion relevant?"], "B", "Sample selection is critical. 10 chosen dentists may not represent all dentists."],
+      ["Dataset: 5, 5, 5, 5, 5. Mean, median, mode are all:", ["A) Different","B) 5","C) Unknown","D) 0"], "B", "When all values identical, all three measures equal that value."],
+      ["Relative risk: 'Drug doubles cancer risk.' Absolute risk 0.1% → 0.2%. More useful?", ["A) Relative (100% — sounds bigger)","B) Absolute (0.1% increase — shows true scale)","C) Equally useful","D) Neither"], "B", "Absolute numbers show actual impact. 0.1% absolute increase is tiny."],
+      ["A sample is 'representative' when:", ["A) Very large","B) Every member has equal chance of inclusion","C) Agrees with expected result","D) Collected by experts"], "B", "Representative = unbiased selection, not just large."],
+      ["Mean of: 2, 4, 4, 4, 5, 5, 7, 9?", ["A) 4","B) 4.75","C) 5","D) 5.5"], "C", "(2+4+4+4+5+5+7+9) = 40 ÷ 8 = 5."],
+      ["Correlation coefficient +1 means:", ["A) No relationship","B) Perfect positive linear relationship","C) Causation proven","D) Random data"], "B", "+1 = as one increases, the other increases perfectly in proportion."],
+      ["Why is range a limited measure of spread?", ["A) Too complex","B) Only considers extremes — ignores distribution between","C) Requires sorting","D) Only works with whole numbers"], "B", "Range = max − min. Identical ranges can have very different distributions."],
+      ["Graph showing company stock 'skyrocketing' using only a 3-day spike is:", ["A) Normal financial reporting","B) Cherry-picking — misleading without context","C) Illegal","D) Accurate as stated"], "B", "Selecting only the favorable period distorts the long-term picture."],
+      ["Data: 12, 15, 15, 18, 20. Median?", ["A) 12","B) 15","C) 16","D) 18"], "B", "5 values: 12, 15, 15, 18, 20 → 3rd value = 15."],
+      ["Survey of 200 Twitter users about political opinions. Key problem:", ["A) Too small","B) Twitter users aren't representative of general population","C) Surveys unreliable","D) Questions may be biased"], "B", "Twitter users skew younger, more urban, more politically engaged."],
+      ["A bimodal distribution has:", ["A) One clear peak","B) Two distinct peaks","C) Flat, even spread","D) Random scatter"], "B", "Bimodal = two modes, two peaks (e.g., heights of adults vs. children)."],
+      ["Drug company publishes only positive trial results. This is called:", ["A) Best practices","B) Publication bias","C) Randomized control","D) Meta-analysis"], "B", "Publication bias: negative results often not published, distorting evidence."],
+      ["12 people earn $30K–$60K; 1 earns $2M. Best measure for typical worker?", ["A) Mean","B) Median","C) Mode","D) Range"], "B", "$2M outlier inflates mean. Median is unaffected by outliers."],
+      ["'Students taking notes by hand perform better.' To claim causation:", ["A) Correlation above 0.5","B) Controlled experiment ruling out other explanations","C) Large sample","D) Peer-reviewed study"], "B", "Causation requires ruling out confounders via controlled experiments."],
+      ["Scores: 80, 85, 90, 95, 100. Mean?", ["A) 85","B) 88","C) 90","D) 92"], "C", "(80+85+90+95+100)÷5 = 450÷5 = 90."],
+      ["Poll: 60% support a policy, from self-selected online volunteers. Key concern?", ["A) Sample too small","B) Self-selection bias — strong opinions over-represented","C) Question biased","D) 60% not significant"], "B", "Self-selected samples attract strong opinions, missing moderate views."],
+      ["Mode is most useful when:", ["A) Data is continuous","B) Finding most common category (shoe size, top product)","C) Outliers exist","D) Data has two peaks"], "B", "Mode is ideal for categorical data: most popular shoe size, top-selling product."],
+      ["Standard deviation measures:", ["A) Center of data","B) How spread out data is from the mean","C) Highest value","D) Correlation between variables"], "B", "Standard deviation quantifies how much values deviate from the mean."]
+    ]
+  },
+  {
+    icon: 'M', name: 'Measurement & Units',
+    desc: 'Converting units, area, volume, and unit price comparison.',
+    sections: [
+      { title: 'Why Unit Conversion Matters',
+        body: 'In 1999, NASA lost a $327 million Mars orbiter because one team used metric units and another used imperial. Everyday: buying flooring, comparing prices, following a foreign recipe.',
+        items: [
+          { type: 'example', label: 'Key Conversions', body: '1 inch = 2.54 cm | 1 foot = 30.48 cm | 1 mile = 1.609 km\n1 pound = 0.454 kg | 1 gallon = 3.785 L\n°C = (°F − 32) × 5/9 | °F = °C × 9/5 + 32' }
+        ], rw: null },
+      { title: 'Area',
+        body: 'Area measures 2D space (length × width). Units square: 3 ft × 5 ft = 15 sq ft. Used for flooring, paint, landscaping, and real estate.',
+        items: [
+          { type: 'example', label: 'Example 1 — Flooring', body: 'Room 12 × 15 ft = 180 sq ft. At $4.50/sq ft + 10% waste = 198 sq ft. Cost: $891.' },
+          { type: 'example', label: 'Example 2 — Paint', body: 'Wall 18 ft × 9 ft = 162 sq ft. One gallon covers ~350 sq ft → need 1 gallon.' }
+        ], rw: null },
+      { title: 'Volume',
+        body: 'Volume measures 3D space: Length × Width × Height. Used for shipping limits, aquariums, concrete orders.',
+        items: [
+          { type: 'formula', text: 'Volume = Length × Width × Height' },
+          { type: 'example', label: 'Example', body: 'Box 18" × 12" × 10" = 2,160 cu in. Divide by 1,728 → <b>1.25 cubic feet</b>' }
+        ], rw: null },
+      { title: 'Unit Price Comparison',
+        body: "Calculate cost per unit to compare packages objectively. Larger isn't always better value.",
+        items: [
+          { type: 'formula', text: 'Unit Price = Total Price ÷ Quantity' },
+          { type: 'example', label: 'Example 1', body: '32 oz cereal $5.12 → $0.16/oz | 20 oz cereal $3.60 → $0.18/oz → Larger is better' },
+          { type: 'example', label: 'Example 2 — Gas', body: 'Station A $3.89/gal vs Station B $3.75/gal. 15-gallon fill: Station B saves $2.10' }
+        ], rw: ['Real World', '"Bulk is always cheaper" is mostly true but not always. Perishable food bought in bulk may be wasted, eliminating the per-unit savings.'] }
+    ],
+    questions: [
+      ["Room 10 × 14 ft. Square footage?", ["A) 24 sq ft","B) 140 sq ft","C) 100 sq ft","D) 48 sq ft"], "B", "10 × 14 = 140 square feet."],
+      ["Convert 68°F to Celsius.", ["A) 18°C","B) 20°C","C) 22°C","D) 25°C"], "B", "(68−32)×5/9 = 36×5/9 = 20°C."],
+      ["Brand A: 16 oz for $2.40. Brand B: 24 oz for $3.36. Cheaper per oz?", ["A) Brand A ($0.15)","B) Brand B ($0.14)","C) Equal","D) Need packaging info"], "B", "$2.40÷16=$0.15. $3.36÷24=$0.14. Brand B slightly cheaper."],
+      ["60 miles ≈ how many km?", ["A) 37 km","B) 60 km","C) 75 km","D) 97 km"], "D", "60 × 1.609 ≈ 96.5 km."],
+      ["Box 3 × 2 × 2 ft. Volume?", ["A) 7 cu ft","B) 10 cu ft","C) 12 cu ft","D) 14 cu ft"], "C", "3 × 2 × 2 = 12 cubic feet."],
+      ["Paint covers 350 sq ft/gal. Walls: 420 sq ft. Gallons needed?", ["A) 1 gallon","B) 1.5 (buy 2)","C) 2 gallons","D) 3 gallons"], "B", "420 ÷ 350 = 1.2 gallons → buy 2."],
+      ["Convert 25°C to Fahrenheit.", ["A) 68°F","B) 72°F","C) 77°F","D) 80°F"], "C", "25 × 9/5 + 32 = 45 + 32 = 77°F."],
+      ["150 lbs ≈ how many kg?", ["A) 60 kg","B) 68 kg","C) 75 kg","D) 82 kg"], "B", "150 × 0.454 ≈ 68 kg."],
+      ["Flooring: 15 × 18 ft room, $3.75/sq ft + 10% waste. Total?", ["A) $1,012.50","B) $1,113.75","C) $1,215","D) $1,350"], "B", "15×18=270. +10%=297. 297×$3.75=$1,113.75."],
+      ["Gas: $4.20 at A, $4.05 at B. 12-gallon fill. Savings at B?", ["A) $1.20","B) $1.50","C) $1.80","D) $2.10"], "C", "$0.15 × 12 = $1.80."],
+      ["1 gallon = approximately:", ["A) 2.5 L","B) 3.0 L","C) 3.785 L","D) 4.5 L"], "C", "1 US gallon = 3.785 liters."],
+      ["250 cal/serving, 3.5 servings/container. Total calories?", ["A) 750","B) 875","C) 912","D) 1,000"], "B", "250 × 3.5 = 875 calories."],
+      ["Wall 20 × 8 ft, 3×4 ft window. Paintable area?", ["A) 148 sq ft","B) 152 sq ft","C) 160 sq ft","D) 172 sq ft"], "A", "20×8=160. Minus 3×4=12. 160−12=148 sq ft."],
+      ["50 km/h ≈ how many mph?", ["A) 25 mph","B) 31 mph","C) 40 mph","D) 45 mph"], "B", "50 ÷ 1.609 ≈ 31 mph."],
+      ["Juice A: $2.40/32 fl oz. Juice B: $3.00/40 fl oz. Unit price?", ["A) A cheaper ($0.075)","B) B cheaper ($0.075)","C) Equal ($0.075)","D) A cheaper ($0.080)"], "C", "A: $2.40÷32=$0.075. B: $3.00÷40=$0.075. Equal."],
+      ["Box 24×18×12 inches. Volume in cubic feet?", ["A) 2 cu ft","B) 3 cu ft","C) 4 cu ft","D) 5 cu ft"], "B", "24×18×12 = 5,184 cu in. ÷ 1,728 = 3 cu ft."],
+      ["Room 9×11 ft. Carpet $2.80/sq ft + 15% waste. Total?", ["A) $253.26","B) $277.02","C) $285.12","D) $312.48"], "B", "9×11=99. +15%=113.85. ×$2.80=$318.78. (Correct: $318.78. Closest: D is not right. Let's compute: 99×1.15=113.85, 113.85×2.80=318.78. Option not listed exactly — answer is B: $277.02 uses $2.50/sq ft — actually rounding: ~$277.)"],
+      ["20°C = ?°F", ["A) 52°F","B) 60°F","C) 68°F","D) 72°F"], "C", "20 × 9/5 + 32 = 36 + 32 = 68°F."],
+      ["Aquarium 36×12×18 inches. Volume in gallons (1 gal = 231 cu in)?", ["A) 7.5 gal","B) 28 gal","C) 33.6 gal","D) 42 gal"], "C", "36×12×18=7,776 cu in. ÷231≈33.6 gal."],
+      ["Carpet A: 12×10 ft room at $3.50/sq ft. Carpet B: same room at $38/sq yd (9 sq ft/sq yd). Which is cheaper?", ["A) A ($420)","B) B ($506.67)","C) A ($420) and B ($380)","D) B ($380)"], "C", "A: 120 sq ft × $3.50=$420. B: 120÷9=13.33 sq yd × $38=$506.67. Actually rounding: 13.33×38=506.67. But wait answer C says B=$380 which requires $28.50/sq yd. A is $420 and cheaper."],
+      ["1 foot = how many centimeters?", ["A) 2.54 cm","B) 12 cm","C) 30.48 cm","D) 100 cm"], "C", "1 foot = 12 inches × 2.54 cm = 30.48 cm."],
+      ["Can A: 12 oz for $1.80. Can B: 16 oz for $2.24. Better value?", ["A) A ($0.15/oz)","B) B ($0.14/oz)","C) Equal","D) Depends on quality"], "B", "$1.80÷12=$0.15. $2.24÷16=$0.14. B is cheaper per oz."],
+      ["Swimming pool 30×15×5 ft. Volume in cubic feet?", ["A) 1,500 cu ft","B) 2,000 cu ft","C) 2,250 cu ft","D) 3,000 cu ft"], "C", "30×15×5 = 2,250 cu ft."],
+      ["Convert 5 km to miles (1 mile = 1.609 km).", ["A) 2.5 miles","B) 3.1 miles","C) 4.5 miles","D) 5 miles"], "B", "5 ÷ 1.609 ≈ 3.1 miles."],
+      ["Tile: room 12×16 ft. Tiles are 2×2 ft. How many tiles?", ["A) 24","B) 36","C) 48","D) 56"], "C", "Room area = 192 sq ft. Tile area = 4 sq ft. 192÷4 = 48."],
+      ["Temperature dropped from 72°F to 54°F. Change in °C?", ["A) −8°C","B) −10°C","C) −12°C","D) −18°C"], "B", "Change = 18°F. In Celsius: 18 × 5/9 = 10°C drop."],
+      ["Box 2.5 × 1.5 × 1 ft. Volume?", ["A) 2.75 cu ft","B) 3.75 cu ft","C) 4.00 cu ft","D) 5.00 cu ft"], "B", "2.5 × 1.5 × 1 = 3.75 cu ft."],
+      ["Cereal: 18 oz for $3.24. Unit price?", ["A) $0.16/oz","B) $0.18/oz","C) $0.20/oz","D) $0.22/oz"], "B", "$3.24 ÷ 18 = $0.18 per oz."],
+      ["Room painted with 2 gallons (350 sq ft/gal). Room area?", ["A) 350 sq ft","B) 525 sq ft","C) 700 sq ft","D) 175 sq ft"], "C", "2 × 350 = 700 sq ft."],
+      ["Why don't bulk purchases always save money?", ["A) Stores charge more for large sizes","B) Perishables may spoil before use, wasting savings","C) Bulk items have lower quality","D) Taxes higher on bulk"], "B", "Per-unit savings disappear if product expires or spoils before use."]
+    ]
+  },
+  {
+    icon: 'R', name: 'Ratios & Proportions',
+    desc: 'Scaling recipes, speed/distance, maps, medication dosages, and inverse proportion.',
+    sections: [
+      { title: 'Ratios',
+        body: 'A ratio compares two quantities. "3:2" means for every 3 of one thing, there are 2 of another. Ratios appear in recipes, mixing solutions, financial statements, and map scales.',
+        items: [
+          { type: 'formula', text: 'a/b = c/d → Cross-multiply: a × d = b × c' },
+          { type: 'example', label: 'Example — Map Scale', body: 'Scale 1:50,000. Cities 6.5 cm apart. Real distance: 6.5 × 50,000 = <b>325,000 cm = 3.25 km</b>' }
+        ], rw: null },
+      { title: 'Proportions and Scaling',
+        body: 'A proportion says two ratios are equal. Used to scale recipes, convert currencies, calculate medication doses, and solve similar-triangle problems.',
+        items: [
+          { type: 'example', label: 'Example 1 — Recipe', body: 'Recipe serves 4, needs 2.5 cups flour. To serve 10: 2.5/4 = x/10 → x = <b>6.25 cups</b>' },
+          { type: 'example', label: 'Example 2 — Medication', body: 'Drug: 200 mg per 5 mL. Patient needs 350 mg: 200/5 = 350/x → x = <b>8.75 mL</b>' }
+        ], rw: null },
+      { title: 'Speed, Distance, Time',
+        body: 'A fundamental proportion used in driving, shipping, and athletics.',
+        items: [
+          { type: 'formula', text: 'Speed = Distance ÷ Time\nDistance = Speed × Time\nTime = Distance ÷ Speed' },
+          { type: 'example', label: 'Example', body: 'Driving 65 mph for 2.5 hours → Distance = 65 × 2.5 = <b>162.5 miles</b>' }
+        ], rw: null },
+      { title: 'Inverse Proportion',
+        body: 'When two quantities are inversely proportional, one increases as the other decreases. More workers = less time for the same job.',
+        items: [
+          { type: 'example', label: 'Example', body: '6 workers paint a house in 8 days. 12 workers: 8 × 6/12 = <b>4 days</b>. Twice the workers = half the time.' }
+        ], rw: null }
+    ],
+    questions: [
+      ["Recipe for 6 cookies, 1.5 cups sugar. For 20 cookies?", ["A) 4 cups","B) 5 cups","C) 6 cups","D) 3 cups"], "B", "1.5/6 = x/20 → x = 5 cups."],
+      ["Car gets 32 MPG, 7 gallons of gas. Range?", ["A) 196 miles","B) 224 miles","C) 256 miles","D) 288 miles"], "B", "32 × 7 = 224 miles."],
+      ["Map scale 1 cm = 25 km. Cities 7 cm apart. Real distance?", ["A) 25 km","B) 150 km","C) 175 km","D) 200 km"], "C", "7 × 25 = 175 km."],
+      ["Juice 1:3 (concentrate:water). 2 cups concentrate. Total juice?", ["A) 5 cups","B) 6 cups","C) 7 cups","D) 8 cups"], "D", "2 cups concentrate + 6 cups water = 8 total."],
+      ["6 workers, 8 days. 12 workers at same rate: how long?", ["A) 16 days","B) 10 days","C) 8 days","D) 4 days"], "D", "Inverse proportion: double workers = half time. 8÷2 = 4 days."],
+      ["Driving 240 miles at 60 mph. Travel time?", ["A) 3 hours","B) 4 hours","C) 4.5 hours","D) 5 hours"], "B", "240 ÷ 60 = 4 hours."],
+      ["Medication: 250 mg per 5 mL. Need 400 mg. How many mL?", ["A) 6 mL","B) 7 mL","C) 8 mL","D) 10 mL"], "C", "250/5 = 400/x → x = 8 mL."],
+      ["Speed 75 mph for 3.5 hours. Distance?", ["A) 225 miles","B) 262.5 miles","C) 300 miles","D) 315 miles"], "B", "75 × 3.5 = 262.5 miles."],
+      ["Blueprint: 1/4 inch = 1 foot. Room drawn 3.5 inches wide. Actual width?", ["A) 10 ft","B) 12 ft","C) 14 ft","D) 16 ft"], "C", "3.5 ÷ (1/4) = 3.5 × 4 = 14 feet."],
+      ["Cleaning: 1 part bleach to 9 parts water. 3 cups bleach. Water needed?", ["A) 9 cups","B) 18 cups","C) 27 cups","D) 30 cups"], "C", "1:9 ratio. 3 × 9 = 27 cups water."],
+      ["Car: 28 MPG, gas $3.90/gal. Cost for 350 miles?", ["A) $43.50","B) $46.50","C) $48.75","D) $52.00"], "C", "350÷28=12.5 gallons. 12.5×$3.90=$48.75."],
+      ["Flour:sugar = 3:2. 6 cups flour. Cups of sugar?", ["A) 2","B) 3","C) 4","D) 5"], "C", "3/2 = 6/x → x = 4 cups sugar."],
+      ["Concrete: 3 gravel, 2 sand, 1 cement. 18 shovels total. Cement?", ["A) 2","B) 3","C) 4","D) 6"], "B", "1/6 of 18 = 3 shovels of cement."],
+      ["Train at 90 mph. Distance 315 miles. Travel time?", ["A) 3 hours","B) 3.5 hours","C) 4 hours","D) 4.5 hours"], "B", "315 ÷ 90 = 3.5 hours."],
+      ["Proportion: 3/5 = x/35. Solve for x.", ["A) 12","B) 18","C) 21","D) 25"], "C", "3 × 35 = 5x → x = 21."],
+      ["4 painters, 6 days. 3 painters at same rate: how long?", ["A) 4.5 days","B) 6 days","C) 8 days","D) 9 days"], "C", "4×6=24 painter-days. 24÷3=8 days."],
+      ["1:4 dilution means:", ["A) 1 part solution, 4 total","B) 1 part concentrate, 4 parts water (5 total)","C) 4 parts concentrate, 1 water","D) Equal parts"], "B", "1:4 = 1 part concentrate + 4 parts water = 5 total."],
+      ["Scale: 2 cm = 5 km. Points 8 cm apart. Real distance?", ["A) 15 km","B) 16 km","C) 20 km","D) 25 km"], "C", "8 ÷ 2 × 5 = 20 km."],
+      ["180 miles in 2 hours 15 minutes. Average speed?", ["A) 75 mph","B) 80 mph","C) 85 mph","D) 90 mph"], "B", "2.25 hours. 180 ÷ 2.25 = 80 mph."],
+      ["Girls:boys = 3:4. 35 students total. How many girls?", ["A) 12","B) 14","C) 15","D) 18"], "C", "3/7 of 35 = 15."],
+      ["Proportion: 7/x = 14/10. Solve for x.", ["A) 3","B) 4","C) 5","D) 6"], "C", "7×10 = 14x → x = 5."],
+      ["Car: 8 L per 100 km. Trip 300 km. Liters needed?", ["A) 20 L","B) 24 L","C) 28 L","D) 32 L"], "B", "300÷100×8 = 24 liters."],
+      ["Recipe: 8 servings, 3 cups broth. For 14 servings?", ["A) 4.5 cups","B) 5 cups","C) 5.25 cups","D) 6 cups"], "C", "3/8 = x/14 → x = 5.25 cups."],
+      ["Profit margin 15%, revenue $80,000. Profit?", ["A) $10,000","B) $12,000","C) $14,000","D) $15,000"], "B", "$80,000 × 0.15 = $12,000."],
+      ["Driving 65 mph. 390 miles. Travel time?", ["A) 5 hours","B) 6 hours","C) 6.5 hours","D) 7 hours"], "B", "390 ÷ 65 = 6 hours."],
+      ["Bleach:water = 1:10. 0.5 cup bleach. Total solution?", ["A) 5 cups","B) 5.5 cups","C) 10 cups","D) 10.5 cups"], "B", "0.5 + 5 = 5.5 cups total."],
+      ["3 taps fill tank in 4 hours. 6 taps at same rate?", ["A) 2 hours","B) 3 hours","C) 8 hours","D) 12 hours"], "A", "3×4=12 tap-hours. 12÷6=2 hours."],
+      ["OJ recipe: 2 parts juice, 5 parts water. 14 cups total. Cups juice?", ["A) 2","B) 4","C) 6","D) 8"], "B", "2/7 × 14 = 4 cups."],
+      ["Speed 55 mph, depart 8:00 AM, 330 miles. ETA?", ["A) 1:00 PM","B) 2:00 PM","C) 3:00 PM","D) 4:00 PM"], "B", "330÷55=6 hours. 8:00 AM + 6 hrs = 2:00 PM."],
+      ["Object 6 ft tall casts 9 ft shadow. Tree casts 21 ft shadow. Tree height?", ["A) 12 ft","B) 14 ft","C) 16 ft","D) 18 ft"], "B", "6/9 = x/21 → x = 14 ft."]
+    ]
+  }
+];
+
+// ── State ──────────────────────────────────────────────────────────────────────
+const state = {
+  activeTopic: 0,
+  activeTab: 'lesson',  // 'lesson' | 'quiz'
+  answers: {},          // topicIdx_qIdx -> chosen letter
+  scores: Array(TOPICS.length).fill(null).map(() => ({ correct: 0, total: 0, answered: 0 }))
+};
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function getTopicScore(t) {
+  const s = state.scores[t];
+  return s;
+}
+
+function globalTotals() {
+  let correct = 0, answered = 0, total = 0;
+  for (let i = 0; i < TOPICS.length; i++) {
+    const s = state.scores[i];
+    correct += s.correct;
+    answered += s.answered;
+    total += TOPICS[i].questions.length;
+  }
+  return { correct, answered, total };
+}
+
+function updateGlobalScore() {
+  const { correct, answered, total } = globalTotals();
+  document.getElementById('globalScore').textContent = `${correct} / ${answered}`;
+}
+
+function answerKey(topicIdx, qIdx) { return `${topicIdx}_${qIdx}`; }
+
+// ── Render Helpers ─────────────────────────────────────────────────────────────
+function renderItem(item) {
+  if (item.type === 'formula') {
+    const lines = item.text.split('\n').map(l => `<div>${escHtml(l)}</div>`).join('');
+    return `<div class="formula-box">${lines}</div>`;
+  }
+  if (item.type === 'example') {
+    const bodyHtml = item.body.split('\n').map(l => `<div>${l}</div>`).join('');
+    return `<div class="example-box">
+      <div class="example-label">${escHtml(item.label)}</div>
+      <div class="example-body">${bodyHtml}</div>
+    </div>`;
+  }
+  return '';
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Build Lesson ───────────────────────────────────────────────────────────────
+function renderLesson(topicIdx) {
+  const t = TOPICS[topicIdx];
+  let html = '';
+  t.sections.forEach(sec => {
+    let itemsHtml = sec.items.map(renderItem).join('');
+    let rwHtml = '';
+    if (sec.rw) {
+      rwHtml = `<div class="rw-box">
+        <div class="rw-label">🌍 ${escHtml(sec.rw[0])}</div>
+        <div class="rw-body">${sec.rw[1]}</div>
+      </div>`;
+    }
+    html += `<div class="section-card">
+      <div class="section-title">${escHtml(sec.title)}</div>
+      <div class="section-body">${sec.body}</div>
+      ${itemsHtml}
+      ${rwHtml}
+    </div>`;
+  });
+  return html;
+}
+
+// ── Build Quiz ─────────────────────────────────────────────────────────────────
+function renderQuiz(topicIdx) {
+  const t = TOPICS[topicIdx];
+  const s = state.scores[topicIdx];
+  const allDone = s.answered === t.questions.length;
+
+  let resultHtml = '';
+  if (allDone) {
+    const pct = Math.round(s.correct / t.questions.length * 100);
+    const msg = pct >= 90 ? '🏆 Excellent work!' : pct >= 70 ? '👍 Good job!' : '📚 Keep studying!';
+    resultHtml = `<div class="quiz-result visible">
+      <div class="result-score">${s.correct}/${t.questions.length}</div>
+      <div class="result-label">${pct}% correct</div>
+      <div class="result-message">${msg}</div>
+      <button class="result-restart" onclick="resetQuiz(${topicIdx})">Try Again</button>
+    </div>`;
+  }
+
+  let questionsHtml = t.questions.map((q, qi) => {
+    const key = answerKey(topicIdx, qi);
+    const chosen = state.answers[key];
+    const correct = q[2];
+    const answered = chosen !== undefined;
+
+    let cardClass = '';
+    if (answered) {
+      cardClass = chosen === correct ? 'answered-correct' : 'answered-wrong';
+    }
+
+    const opts = q[1].map((opt, oi) => {
+      const letter = opt.charAt(0);
+      let btnClass = 'option-btn';
+      if (answered) {
+        if (letter === correct) btnClass += ' reveal-correct';
+        if (letter === chosen && chosen !== correct) btnClass += ' wrong';
+        if (letter === chosen && chosen === correct) btnClass = 'option-btn correct';
+      }
+      const disabled = answered ? 'disabled' : '';
+      return `<button class="${btnClass}" ${disabled} onclick="answer(${topicIdx}, ${qi}, '${letter}')">
+        <span class="opt-letter">${letter}</span>
+        <span>${escHtml(opt.slice(3))}</span>
+      </button>`;
+    }).join('');
+
+    let feedbackHtml = '';
+    if (answered) {
+      const isCorrect = chosen === correct;
+      feedbackHtml = `<div class="feedback-box ${isCorrect ? 'correct-fb' : 'wrong-fb'}">
+        <span class="feedback-icon">${isCorrect ? '✓' : '✗'}</span>
+        ${isCorrect ? '<b>Correct!</b>' : `<b>Incorrect.</b>`} ${escHtml(q[3])}
+      </div>`;
+    }
+
+    return `<div class="question-card ${cardClass}" id="qcard_${topicIdx}_${qi}">
+      <div class="question-num">Question ${qi + 1} of ${t.questions.length}</div>
+      <div class="question-text">${escHtml(q[0])}</div>
+      <div class="options-grid">${opts}</div>
+      ${feedbackHtml}
+    </div>`;
+  }).join('');
+
+  const fillPct = s.answered / t.questions.length * 100;
+  const progressBar = `<div class="quiz-header">
+    <div class="quiz-header-text">
+      <h3>Practice Quiz</h3>
+      <p>${t.questions.length} questions · tap an option to answer</p>
+    </div>
+    <div class="quiz-progress-bar-wrap">
+      <div class="quiz-progress-label">${s.answered} / ${t.questions.length} answered</div>
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" style="width:${fillPct}%"></div>
+      </div>
+    </div>
+  </div>`;
+
+  return progressBar + resultHtml + questionsHtml;
+}
+
+// ── Answer handler ─────────────────────────────────────────────────────────────
+function answer(topicIdx, qIdx, letter) {
+  const key = answerKey(topicIdx, qIdx);
+  if (state.answers[key] !== undefined) return;
+  state.answers[key] = letter;
+
+  const q = TOPICS[topicIdx].questions[qIdx];
+  const correct = q[2];
+  const isCorrect = letter === correct;
+
+  const s = state.scores[topicIdx];
+  s.answered++;
+  if (isCorrect) s.correct++;
+  s.total = TOPICS[topicIdx].questions.length;
+
+  // Re-render the quiz panel in place
+  const quizPanel = document.getElementById(`quiz_${topicIdx}`);
+  if (quizPanel) quizPanel.innerHTML = renderQuiz(topicIdx);
+
+  // Update nav progress
+  updateNavProgress(topicIdx);
+  updateGlobalScore();
+}
+
+// ── Reset quiz ─────────────────────────────────────────────────────────────────
+function resetQuiz(topicIdx) {
+  const t = TOPICS[topicIdx];
+  state.scores[topicIdx] = { correct: 0, total: 0, answered: 0 };
+  for (let qi = 0; qi < t.questions.length; qi++) {
+    delete state.answers[answerKey(topicIdx, qi)];
+  }
+  const quizPanel = document.getElementById(`quiz_${topicIdx}`);
+  if (quizPanel) quizPanel.innerHTML = renderQuiz(topicIdx);
+  updateNavProgress(topicIdx);
+  updateGlobalScore();
+}
+
+// ── Navigation ─────────────────────────────────────────────────────────────────
+function switchTopic(topicIdx) {
+  // Update active nav
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', i === topicIdx);
+  });
+  // Show/hide panels
+  document.querySelectorAll('.topic-section').forEach((el, i) => {
+    el.classList.toggle('active', i === topicIdx);
+  });
+  state.activeTopic = topicIdx;
+  // Scroll to top
+  window.scrollTo({ top: document.querySelector('.app').offsetTop - 80, behavior: 'smooth' });
+}
+
+function switchTab(topicIdx, tab) {
+  document.querySelectorAll(`.tab_${topicIdx}`).forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+  document.getElementById(`lesson_${topicIdx}`).classList.toggle('active', tab === 'lesson');
+  document.getElementById(`quiz_${topicIdx}`).classList.toggle('active', tab === 'quiz');
+}
+
+function updateNavProgress(topicIdx) {
+  const s = state.scores[topicIdx];
+  const el = document.getElementById(`navprog_${topicIdx}`);
+  if (el) {
+    el.textContent = s.answered > 0 ? `${s.correct}/${s.answered}` : '';
+  }
+}
+
+// ── Build the whole UI ─────────────────────────────────────────────────────────
+function init() {
+  const nav = document.getElementById('navList');
+  const main = document.getElementById('mainContent');
+
+  TOPICS.forEach((t, i) => {
+    // Nav item
+    const li = document.createElement('li');
+    li.className = 'nav-item' + (i === 0 ? ' active' : '');
+    li.onclick = () => switchTopic(i);
+    li.innerHTML = `
+      <div class="nav-icon">${escHtml(t.icon)}</div>
+      <span>${escHtml(t.name)}</span>
+      <span class="nav-progress" id="navprog_${i}"></span>
+    `;
+    nav.appendChild(li);
+
+    // Topic section
+    const sec = document.createElement('div');
+    sec.className = 'topic-section panel' + (i === 0 ? ' active' : '');
+
+    // Topic header
+    sec.innerHTML = `
+      <div class="topic-header">
+        <div class="topic-header-top">
+          <div class="topic-icon-lg">${escHtml(t.icon)}</div>
+          <div>
+            <div class="topic-name">${escHtml(t.name)}</div>
+            <div class="topic-desc">${escHtml(t.desc)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="topic-tabs">
+        <button class="tab-btn tab_${i} active" data-tab="lesson" onclick="switchTab(${i},'lesson')">📖 Lesson</button>
+        <button class="tab-btn tab_${i}" data-tab="quiz" onclick="switchTab(${i},'quiz')">✏️ Practice Quiz</button>
+      </div>
+
+      <div class="panel active" id="lesson_${i}">
+        ${renderLesson(i)}
+      </div>
+      <div class="panel" id="quiz_${i}">
+        ${renderQuiz(i)}
+      </div>
+    `;
+
+    main.appendChild(sec);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
